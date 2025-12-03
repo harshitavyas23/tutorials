@@ -12,7 +12,7 @@ pipeline {
 
     stages {
 
-        stage('Clone Repo') {
+       stage('Clone Repo') {
             steps {
                 git branch: 'master',
                     url: 'https: //github.com/harshitavyas23/tutorials'
