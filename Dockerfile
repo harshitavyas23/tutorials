@@ -1,5 +1,5 @@
 # Use NGINX lightweight image
-FROM nginx:alpine
+FROM --platform=linux/amd64 nginx:alpine
 
 # Remove default NGINX HTML
 RUN rm -rf /usr/share/nginx/html/*
