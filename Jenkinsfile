@@ -5,7 +5,8 @@ pipeline {
         DOCKERHUB_USERNAME = "harshitavyas23"
         IMAGE_NAME = "tutorials"
         EC2_USER = "ec2-user"
-        EC2_IP = "44.250.234.209"  // replace with your instance public IP
+        EC2_IP = "44.250.234.209" // replace with your instance public IP
+        DOCKER_CMD = "/opt/homebrew/bin/docker" // full path to Docker
     }
 
     stages {
@@ -19,21 +20,21 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
+                sh "${DOCKER_CMD} build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
-                    sh "echo ${DOCKER_PASS} | docker login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                    sh "echo \"\$DOCKER_PASS\" | ${DOCKER_CMD} login -u ${DOCKERHUB_USERNAME} --password-stdin"
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
+                sh "${DOCKER_CMD} push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
             }
         }
 
