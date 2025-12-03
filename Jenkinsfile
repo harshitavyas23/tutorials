@@ -33,7 +33,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh """
-                    ${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} build \
+                    ${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} buildx \
                         --no-cache \
                         --platform linux/amd64 \
                         -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest .
