@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_USERNAME = "harshitavyas23"
+        DOCKER_CONFIG = "/Users/harshita.vyas/.docker"
         IMAGE_NAME = "tutorials"
         EC2_USER = "ec2-user"
         EC2_IP = "44.250.234.209" // replace with your instance public IP
