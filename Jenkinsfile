@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_USERNAME = "harshitavyas23"
-        IMAGE_NAME = "tutorials"
+        IMAGE_NAME = "tutorial_linux"
         EC2_USER = "ec2-user"
         EC2_IP = "44.250.234.209"
         DOCKER_CMD = "/opt/homebrew/bin/docker"
