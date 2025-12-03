@@ -19,17 +19,17 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh "${DOCKER_CMD} build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
-            }
-        }
-
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
                     sh "echo \"\$DOCKER_PASS\" | ${DOCKER_CMD} login -u ${DOCKERHUB_USERNAME} --password-stdin"
                 }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "${DOCKER_CMD} build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
             }
         }
 
