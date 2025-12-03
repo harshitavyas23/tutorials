@@ -34,6 +34,7 @@ pipeline {
             steps {
                 sh """
                     ${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} build \
+                        --platform linux/amd64 \
                         -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest .
                 """
             }
