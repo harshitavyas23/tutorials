@@ -5,9 +5,9 @@ pipeline {
         DOCKERHUB_USERNAME = "harshitavyas23"
         IMAGE_NAME = "tutorials"
         EC2_USER = "ec2-user"
-        EC2_IP = "44.250.234.209" // replace with your instance public IP
-        DOCKER_CMD = "/opt/homebrew/bin/docker" // full path to Docker
-        TEMP_DOCKER_CONFIG = "/tmp/docker-login-dir" // temporary Docker config
+        EC2_IP = "44.250.234.209"
+        DOCKER_CMD = "/opt/homebrew/bin/docker"
+        TEMP_DOCKER_CONFIG = "/tmp/docker-login-dir"
     }
 
     stages {
@@ -32,21 +32,30 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh "${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
+                sh """
+                    ${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} build \
+                        -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest .
+                """
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
+                sh """
+                    ${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} push \
+                        ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest
+                """
             }
         }
 
         stage('Deploy to EC2') {
             steps {
-                sshagent(['ec2-ssh-key']) {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'ec2-ssh-key',
+                    keyFileVariable: 'SSH_KEY'
+                )]) {
                     sh """
-                        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} '
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_IP} '
                             docker pull ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest &&
                             docker stop ${IMAGE_NAME} || true &&
                             docker rm ${IMAGE_NAME} || true &&
