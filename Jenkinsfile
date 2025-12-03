@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         DOCKERHUB_USERNAME = "harshitavyas23"
-        DOCKER_CONFIG = "/Users/harshita.vyas/.docker"
         IMAGE_NAME = "tutorials"
         EC2_USER = "ec2-user"
         EC2_IP = "44.250.234.209" // replace with your instance public IP
         DOCKER_CMD = "/opt/homebrew/bin/docker" // full path to Docker
+        TEMP_DOCKER_CONFIG = "/tmp/docker-login-dir" // temporary Docker config
     }
 
     stages {
@@ -22,20 +22,23 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
-                    sh "echo \"\$DOCKER_PASS\" | ${DOCKER_CMD} login -u ${DOCKERHUB_USERNAME} --password-stdin"
+                    sh """
+                        mkdir -p ${TEMP_DOCKER_CONFIG}
+                        echo "\$DOCKER_PASS" | ${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} login -u ${DOCKERHUB_USERNAME} --password-stdin
+                    """
                 }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "${DOCKER_CMD} build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
+                sh "${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} build -t ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest ."
             }
         }
 
         stage('Push Image') {
             steps {
-                sh "${DOCKER_CMD} push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
+                sh "${DOCKER_CMD} --config ${TEMP_DOCKER_CONFIG} push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
             }
         }
 
@@ -55,4 +58,3 @@ pipeline {
         }
     }
 }
-
